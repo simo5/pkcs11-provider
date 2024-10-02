@@ -1,9 +1,10 @@
 pkcs11_provider_sources = [
   'asymmetric_cipher.c',
+  'cipher.c',
   'debug.c',
-  'encoder.c',
   'decoder.c',
   'digests.c',
+  'encoder.c',
   'exchange.c',
   'kdf.c',
   'keymgmt.c',
