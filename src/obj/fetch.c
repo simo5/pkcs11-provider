@@ -278,13 +278,10 @@ static CK_RV pre_process_ec_key_data(P11PROV_OBJ *key)
             return CKR_KEY_INDIGESTIBLE;
         }
 
-        curve_nid = EC_GROUP_get_curve_name(group);
-        if (curve_nid != NID_undef) {
-            curve_name = OSSL_EC_curve_nid2name(curve_nid);
-            if (curve_name == NULL) {
-                EC_GROUP_free(group);
-                return CKR_KEY_INDIGESTIBLE;
-            }
+        curve_name = p11prov_ec_group_to_curve_name(group, &curve_nid);
+        if (curve_name == NULL && curve_nid != NID_undef) {
+            EC_GROUP_free(group);
+            return CKR_KEY_INDIGESTIBLE;
         }
         key->data.key.bit_size = EC_GROUP_order_bits(group);
         key->data.key.size = (key->data.key.bit_size + 7) / 8;

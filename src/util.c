@@ -1351,3 +1351,23 @@ CK_KEY_TYPE p11prov_get_key_type_from_string(const char *key_type)
     /* Unknown key type */
     return CK_UNAVAILABLE_INFORMATION;
 }
+
+const char *p11prov_ec_group_to_curve_name(EC_GROUP *group, int *nid)
+{
+    int curve_nid;
+    if (!group) {
+        if (nid) {
+            *nid = NID_undef;
+        }
+        return NULL;
+    }
+
+    curve_nid = EC_GROUP_get_curve_name(group);
+    if (curve_nid == NID_undef) {
+        curve_nid = EC_GROUP_check_named_curve(group, 0, NULL);
+    }
+    if (nid) {
+        *nid = curve_nid;
+    }
+    return OSSL_EC_curve_nid2name(curve_nid);
+}

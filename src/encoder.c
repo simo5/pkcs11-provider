@@ -457,17 +457,18 @@ static int p11prov_print_pkeyinfo(CK_ATTRIBUTE *pkeyinfo, BIO *out)
 
             group = d2i_ECPKParameters(NULL, &pm, pmlen);
             if (group) {
-                nid = EC_GROUP_get_curve_name(group);
-                if (nid != NID_undef) {
-                    const char *name;
-                    BIO_printf(out, "ASN1 OID: %s\n", OBJ_nid2sn(nid));
-                    name = OSSL_EC_curve_nid2name(nid);
+                const char *name;
+                name = p11prov_ec_group_to_curve_name(group, &nid);
+                if (name == NULL && nid == NID_undef) {
+                    nid = EC_GROUP_get_field_type(group);
+                    BIO_printf(out, "FIELD TYPE: %s\n", OBJ_nid2sn(nid));
+                } else {
+                    if (nid != NID_undef) {
+                        BIO_printf(out, "ASN1 OID: %s\n", OBJ_nid2sn(nid));
+                    }
                     if (name) {
                         BIO_printf(out, "CURVE NAME: %s\n", name);
                     }
-                } else {
-                    nid = EC_GROUP_get_field_type(group);
-                    BIO_printf(out, "FIELD TYPE: %s\n", OBJ_nid2sn(nid));
                 }
                 EC_GROUP_free(group);
             } else {
