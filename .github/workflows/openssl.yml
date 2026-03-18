@@ -35,7 +35,7 @@ jobs:
               perl-File-Copy perl-Pod-Html perl-Time-Piece git clang
 
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Get Date for /opt cache entry
         id: get-date-opt
@@ -88,7 +88,7 @@ jobs:
               kryoptic
 
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Get Date for /opt cache entry
         id: get-date-opt

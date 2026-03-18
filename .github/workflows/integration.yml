@@ -36,7 +36,7 @@ jobs:
         run: dnf -y install gcc git meson openssl-devel
 
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup, Build and Install pkcs11-provider
         run: |
@@ -73,7 +73,7 @@ jobs:
               gcc g++ sqlite-devel httpd bind9-next softhsm
 
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Get Kryoptic
         id: kryoptic_setup

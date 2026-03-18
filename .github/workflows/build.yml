@@ -112,7 +112,7 @@ jobs:
 
       - name: Checkout Repository
         if : ( steps.skip-check.outputs.skiptest != 'true' )
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup
         id: setup
@@ -237,7 +237,7 @@ jobs:
           fi
 
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup
         run: |
