@@ -602,9 +602,22 @@ static int ec_export_params(P11PROV_OBJ *obj, OSSL_PARAM *params, int *nparams)
     CK_RV rv;
     int ret;
 
-    attr.type = CKA_EC_PARAMS;
+    /* Prefer the Curve Name (OID) to exporting explicit params */
+    attr.type = CKA_P11PROV_CURVE_NAME;
     rv = get_public_attrs(obj, &attr, 1);
     if (rv == CKR_OK) {
+        params[*nparams] = OSSL_PARAM_construct_utf8_string(
+            OSSL_PKEY_PARAM_GROUP_NAME, attr.pValue, attr.ulValueLen);
+        attr.pValue = NULL; /* steal it, will be freed by caller */
+        *nparams += 1;
+    } else {
+        attr.type = CKA_EC_PARAMS;
+        rv = get_public_attrs(obj, &attr, 1);
+        if (rv != CKR_OK) {
+            P11PROV_raise(obj->ctx, rv, "Failed to get EC parameters");
+            ret = RET_OSSL_ERR;
+            goto done;
+        }
         /* in d2i functions 'in' is overwritten to return the remainder of
          * the buffer after parsing, so we always need to avoid passing in
          * our pointer holders, to avoid having them clobbered */
@@ -618,18 +631,6 @@ static int ec_export_params(P11PROV_OBJ *obj, OSSL_PARAM *params, int *nparams)
         if (ret != RET_OSSL_OK) {
             goto done;
         }
-    } else {
-        attr.type = CKA_P11PROV_CURVE_NAME;
-        rv = get_public_attrs(obj, &attr, 1);
-        if (rv != CKR_OK) {
-            P11PROV_raise(obj->ctx, rv, "Failed to get EC parameters");
-            ret = RET_OSSL_ERR;
-            goto done;
-        }
-        params[*nparams] = OSSL_PARAM_construct_utf8_string(
-            OSSL_PKEY_PARAM_GROUP_NAME, attr.pValue, attr.ulValueLen);
-        attr.pValue = NULL; /* steal it, will be freed by caller */
-        *nparams += 1;
     }
     ret = RET_OSSL_OK;
 
