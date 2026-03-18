@@ -14,7 +14,7 @@ jobs:
     container: quay.io/fedora/fedora:latest
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Install Dependencies
         run: |
@@ -42,7 +42,7 @@ jobs:
 
       - name: Checkout Repository
         if: ${{ github.event.pull_request.base.sha }}
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup
         if: ${{ github.event.pull_request.base.sha }}
