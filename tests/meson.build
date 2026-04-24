@@ -62,13 +62,14 @@ if get_option('b_sanitize') == 'address'
   endif
 
   # Avoids closing dlopened libraries for ASan to be able to print usable traces
-  fake_dlclose = shared_library(
-    'fake_dlclose',
-    'fake_dlclose.c',
+  police_dlopen = shared_library(
+    'police_dlopen',
+    'police_dlopen.c',
     name_prefix: '',
   )
-  setup_deps += [fake_dlclose]
+  setup_deps += [police_dlopen]
 
+  audit_env_var = 'LD_AUDIT'
   preload_env_var = 'LD_PRELOAD'
   if host_machine.system() == 'darwin'
     preload_env_var = 'DYLD_INSERT_LIBRARIES'
@@ -77,15 +78,14 @@ if get_option('b_sanitize') == 'address'
   # LD_PRELOAD is needed before invoking openssl as it is not instrumented with
   # asan and asan needs to be loaded as a first dynamic library of the process.
   if preload_libasan != 'no'
-    checker = 'env @0@=@1@:@2@'.format(preload_env_var, preload_libasan, fake_dlclose.full_path())
+    checker = 'env @0@=@1@ @2@=@3@'.format(preload_env_var, preload_libasan, audit_env_var, police_dlopen.full_path())
   else
-    checker = 'env @0@=@1@'.format(preload_env_var, fake_dlclose.full_path())
+    checker = 'env @0@=@1@'.format(audit_env_var, police_dlopen.full_path())
   endif
 
   add_env = {
     'ASAN_OPTIONS': 'fast_unwind_on_malloc=0:detect_leaks=1',
     'LSAN_OPTIONS': 'suppressions=@0@/lsan.supp'.format(meson.current_source_dir()),
-    'FAKE_DLCLOSE': fake_dlclose.full_path(),
     'CHECKER': checker,
   }
 
