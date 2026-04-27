@@ -8,7 +8,7 @@ find_kryoptic() {
     for _lib in "$@" ; do
         if test -f "$_lib" ; then
             echo "Using kryoptic path $_lib"
-            P11LIB="$_lib"
+            export P11LIB="${_lib}"
             return
         fi
     done
@@ -40,11 +40,10 @@ export TOKENLABEL="${TOKENLABEL:-Kryoptic Token}"
 export TOKENLABELURI="${TOKENLABELURI:-Kryoptic%20Token}"
 
 # init token
-pkcs11-tool --module "${P11LIB}" --init-token \
-    --label "${TOKENLABEL}" --so-pin "${PINVALUE}" 2>&1
+ptool --init-token --label "${TOKENLABEL}" --so-pin "${PINVALUE}" 2>&1
 # set user pin
-pkcs11-tool --module "${P11LIB}" --so-pin "${PINVALUE}" \
-    --login --login-type so --init-pin --pin "${PINVALUE}" 2>&1
+ptool --so-pin "${PINVALUE}" --login --login-type so --init-pin \
+      --pin "${PINVALUE}" 2>&1
 
 export TOKENCONFIGVARS="export KRYOPTIC_CONF=$TOKDIR/kryoptic.conf"
 
