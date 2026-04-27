@@ -24,7 +24,12 @@ fi
 # Kryoptic allows for 10 tries by default
 for i in {1..10}; do
     echo "Login attempt: $i"
-    ptool -l -I -p "${BADPIN}" && false
+    FAIL=1
+    ptool -l -I -p "${BADPIN}" || FAIL=0
+    if [ $FAIL -eq 0 ]; then
+        echo "Should have failed!"
+        exit 1
+    fi
     DETECT=0
     ptool -T | grep "final user PIN try" && DETECT=1
     if [ $DETECT -eq 1 ]; then
