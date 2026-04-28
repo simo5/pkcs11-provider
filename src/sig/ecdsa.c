@@ -82,7 +82,7 @@ struct ecdsa_data {
     { CK_UNAVAILABLE_INFORMATION, 0, NULL, 0 },
 };
 
-static struct ecdsa_data *ecdsa_digest_map(CK_MECHANISM_TYPE digest)
+static const struct ecdsa_data *ecdsa_digest_map(CK_MECHANISM_TYPE digest)
 {
     for (int i = 0; ecdsa_mech_map[i].digest != CK_UNAVAILABLE_INFORMATION;
          i++) {
@@ -102,7 +102,7 @@ static CK_RV p11prov_ecdsa_set_mechanism(P11PROV_SIG_CTX *sigctx)
     switch (sigctx->mechtype) {
     case CKM_ECDSA:
         if (sigctx->digest_op) {
-            struct ecdsa_data *data;
+            const struct ecdsa_data *data;
             data = ecdsa_digest_map(sigctx->digest);
             if (!data) {
                 return CKR_MECHANISM_INVALID;
@@ -545,7 +545,7 @@ static int p11prov_ecdsa_get_ctx_params(void *ctx, OSSL_PARAM *params)
 
     p = OSSL_PARAM_locate(params, OSSL_SIGNATURE_PARAM_ALGORITHM_ID);
     if (p) {
-        struct ecdsa_data *data;
+        const struct ecdsa_data *data;
         data = ecdsa_digest_map(sigctx->digest);
         if (!data) {
             return RET_OSSL_ERR;
